@@ -5393,7 +5393,41 @@ app.get("/api/get/message/from/soleperson/to/user/for/user/admin/screen/:userId"
     })
   }
 
-  var getAllUserMessageForShowing = "";
+
+  const detectLanguage = async (text) => {
+
+    try {
+        let response = await translate.detect(text);
+        return response[0].language;
+    } catch (error) {
+        console.log(`Error at detectLanguage --> ${error}`);
+        return 0;
+    }
+  }
+
+
+  const translateText = async (text, targetLanguage) => {
+  
+    try {
+        let [response] = await translate.translate(text, targetLanguage);
+        return response;
+    } catch (error) {
+        console.log(`Error at translateText --> ${error}`);
+        return 0;
+    }
+  };
+
+
+
+function sendDate(message,solePerson) {
+  res.send({
+    Message: message,
+    AllSolePerson: solePerson
+  })
+}
+
+
+  var getAllUserMessageForShowing = [];
   var getAllSolePersonForShowing = "";
 
   getAllUserMessage(req.params.userId, function (err, results) {
@@ -5403,23 +5437,67 @@ app.get("/api/get/message/from/soleperson/to/user/for/user/admin/screen/:userId"
       return;
     } else {
       console.log(results)
-      getAllUserMessageForShowing = results
-      if (getAllUserMessageForShowing) {
-        getAllSolePerson(function (err, results) {
-          console.log("getAllSolePerson get called")
-          if (err) {
-            console.log(err);
-            return;
-          } else {
-            console.log(results)
-            getAllSolePersonForShowing = results
-            res.send({
-              Message: getAllUserMessageForShowing,
-              AllSolePerson: getAllSolePersonForShowing
-            })
-          }
-        })
-      }
+
+
+      results.forEach(element => {
+        console.log("element***********")
+        console.log(element)
+        console.log(element.contact_content)
+        console.log("element***********")
+  
+  detectLanguage(element.contact_content)
+  .then((res) => {
+      console.log(res);
+      translateText(element.contact_content, 'zh-CN')
+      .then((res) => {
+          console.log(res);
+          element["contact_content"] = res
+          getAllUserMessageForShowing.push(element)
+          console.log("fff*********")
+          console.log(getAllUserMessageForShowing)
+          console.log("fff*********")
+  
+  if (getAllUserMessageForShowing.length === results.length) {
+
+    
+      getAllSolePerson(function (err, results) {
+        console.log("getAllSolePerson get called")
+        if (err) {
+          console.log(err);
+          return;
+        } else {
+          console.log(results)
+          getAllSolePersonForShowing = results
+          sendDate(getAllUserMessageForShowing,getAllSolePersonForShowing)
+        }
+      })
+    
+
+  }
+  
+  
+      })
+      .catch((err) => {
+  
+          console.log(err);
+          getAllUserMessageForShowing.push(element)
+      });
+      
+  })
+  .catch((err) => {
+      console.log(err);
+  });
+  
+  
+  
+  
+      
+        console.log(getAllUserMessageForShowing)
+      })
+
+
+      
+      
     }
   })
 
