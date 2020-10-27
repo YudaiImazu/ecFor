@@ -1217,7 +1217,7 @@ app.post("/api/company/register/information", async (req, res, next) => {
  
 
 
-  connection.query("insert into company_information(company_id,name,adress,vision,history,service) values (" + "'" + req.body.data.companyId + "'" + "," + "'" + req.body.data.companyName + "'" + ","  + "'" + req.body.data.companyAdress + "'" + "," + "'" + req.body.data.companyVision + "'" + "," + "'"  + req.body.data.companyHistory + "'" + "," + "'" + req.body.data.companyService + "'" + ");", function (error, results, fields) {
+  connection.query("insert into company_information(company_id,name,adress,vision,history,service,mail) values (" + "'" + req.body.data.companyId + "'" + "," + "'" + req.body.data.companyName + "'" + ","  + "'" + req.body.data.companyAdress + "'" + "," + "'" + req.body.data.companyVision + "'" + "," + "'"  + req.body.data.companyHistory + "'" + "," + "'" + req.body.data.companyService + "'" + "," + "'" + req.body.data.companyEmail  + "'" + ");", function (error, results, fields) {
     if (error) throw error;
     else {
      
@@ -3704,7 +3704,7 @@ connection.query("UPDATE company_patent_video SET video_path='" + req.body.data.
 app.post("/api/company/admin/edit/information", async(req, res) => {
 console.log(req.body.data)
 
-connection.query("UPDATE company_information SET name ='" + req.body.data.CompanyName + "',adress='" + req.body.data.CompanyAdress + "',vision='" + req.body.data.CompanyVision + "',history='" + req.body.data.CompanyHistory + "',service='" + req.body.data.CompanyService + "' WHERE id ='" + req.body.data.InformationId + "'", function (err, results) {
+connection.query("UPDATE company_information SET name ='" + req.body.data.CompanyName + "',adress='" + req.body.data.CompanyAdress + "',vision='" + req.body.data.CompanyVision + "',history='" + req.body.data.CompanyHistory + "',service='" + req.body.data.CompanyService + "',mail='" + req.body.data.CompanyEmail + "' WHERE id ='" + req.body.data.InformationId + "'", function (err, results) {
   if (err) throw err;
   else {
     console.log("result of update company informatiion == " + results)
@@ -4535,13 +4535,16 @@ var getAlluserForShowing = ""
     console.log("length**************")
     console.log(results.length)
     console.log("length**************")
-    console.log(results[0].contact_content)
+    // console.log(results[0].contact_content)
+if (results.length > 0 ) {
+
 
     results.forEach(element => {
       console.log("element***********")
       console.log(element)
       console.log(element.contact_content)
       console.log("element***********")
+      
 
 detectLanguage(element.contact_content)
 .then((res) => {
@@ -4613,7 +4616,14 @@ detectLanguage(element.contact_content)
       console.log(getAllCompanyMessageForShowing)
     })
 
-    
+  } else {
+    res.send({
+      Message: [],
+    CompanyLogo: [],
+    CompanyName: [],
+    AllUser: []
+    })
+  } 
 
  
     
@@ -4953,10 +4963,34 @@ connection.query("insert into contact_between_customer_sole_person (user_id,sole
 app.post("/api/send/message/from/company/to/user", async (req, res) => {
   console.log(req.body.data)
 
+  // const url = "http://localhost:3000//user/admin/page/" + req.body.data.UserId
+  const url = "https://vitamin88.com/user/admin/page/" + req.body.data.UserId
+
+
   connection.query("insert into conntact_between_customer_company (user_id,company_id,sender,contact_content,created_at) values ('" + req.body.data.UserId + "','" + req.body.data.CompanyId + "','" + req.body.data.sender + "','" + req.body.data.message + "','" + req.body.data.date + "');", function (err, results) {
 if (err) throw err;
 else {
   console.log(results);
+  
+
+  let transporter = nodemailer.createTransport(smtpSetting);
+        
+  let mailOptions = {
+      from: 'kaihatsu@mingle.co.jp',
+      to: req.body.data.userEmail, 
+      subject: "VITAmin 接收讯息", // Subject line
+      text: "我收到了公司的电子邮件", // plain text body
+      html: "<h3>我收到了公司的电子邮件。请点击下面的URL查看</h3><br/><a href=" + url + ">" + url +"</p>", // html body
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        return console.log(error.message);
+    }
+    console.log('success');
+});
+
+
 }
   })
 })
@@ -5265,6 +5299,10 @@ getAllSolePersonMessage(req.params.id, function(err, results) {
     return;
   } else {
     console.log(results)
+
+    if (results.length > 0) {
+
+    
     
     results.forEach(element => {
       console.log("element***********")
@@ -5345,6 +5383,15 @@ detectLanguage(element.contact_content)
     
       console.log(getAllSolePersonMessageForShowing)
     })
+
+  } else {
+    res.send({
+      Message: [],
+    SolePersonImage: [],
+    SolePersonName: [],
+    AllUser: []
+    })
+  }
 
 
 
