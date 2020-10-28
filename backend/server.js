@@ -4398,10 +4398,34 @@ app.post("/api/contact/from/user/to/company", async (req, res) => {
 
   console.log(req.body.data)
 
+
+  const url = "https://vitamin88.com/company/admin/home/" + req.body.data.CompanyId
+
+
 connection.query("insert into conntact_between_customer_company (user_id,company_id,sender,contact_content,genre,created_at) values ('" + req.body.data.UserId + "','" + req.body.data.CompanyId + "','" + req.body.data.From + "','" + req.body.data.Message + "','" + req.body.data.Genre + "','" + req.body.data.date + "');", function (err, results) {
   if (err) throw err;
   else {
     console.log(results);
+
+
+    let transporter = nodemailer.createTransport(smtpSetting);
+        
+    let mailOptions = {
+        from: 'kaihatsu@mingle.co.jp',
+        to: req.body.data.companyEmail, 
+        subject: "VITAmin メール受信通知", // Subject line
+        text: "問あわせのメールを受信いたしました。", // plain text body
+        html: "<h3>問あわせのメールを受信いたしました。下記のURLからご確認ください</h3><br/><a href=" + url + ">" + url +"</p>", // html body
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          return console.log(error.message);
+      }
+      console.log('success');
+  });
+
+
   }
 })
 
@@ -4873,10 +4897,31 @@ app.post("/api/contact/from/user/to/soleperson", async (req, res) => {
 
   console.log(req.body.data)
 
+  const url = "https://vitamin88.com/soleperson/admin/home/" + req.body.data.SolePersonId
+
+
 connection.query("insert into contact_between_customer_sole_person (user_id,sole_person_id,sender,contact_content,genre,created_at) values ('" + req.body.data.UserId + "','" + req.body.data.SolePersonId + "','" + req.body.data.From + "','" + req.body.data.Message + "','" + req.body.data.Genre + "','" + req.body.data.date + "');", function (err, results) {
   if (err) throw err;
   else {
     console.log(results);
+
+    let transporter = nodemailer.createTransport(smtpSetting);
+        
+    let mailOptions = {
+        from: 'kaihatsu@mingle.co.jp',
+        to: req.body.data.SolePersonEmail, 
+        subject: "VITAmin メール受信通知", // Subject line
+        text: "問あわせのメールを受信いたしました。", // plain text body
+        html: "<h3>問あわせのメールを受信いたしました。下記のURLからご確認ください</h3><br/><a href=" + url + ">" + url +"</p>", // html body
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          return console.log(error.message);
+      }
+      console.log('success');
+  });
+
   }
 })
 
@@ -5005,10 +5050,31 @@ else {
 app.post("/api/send/message/from/soleperson/to/user", async (req, res) => {
   console.log(req.body.data)
 
+  const url = "https://vitamin88.com/user/admin/page/" + req.body.data.UserId
+
+
   connection.query("insert into contact_between_customer_sole_person (user_id,sole_person_id,sender,contact_content,created_at) values ('" + req.body.data.UserId + "','" + req.body.data.SolePersonId + "','" + req.body.data.sender + "','" + req.body.data.message + "','" + req.body.data.date + "');", function (err, results) {
 if (err) throw err;
 else {
   console.log(results);
+
+  let transporter = nodemailer.createTransport(smtpSetting);
+        
+  let mailOptions = {
+      from: 'kaihatsu@mingle.co.jp',
+      to: req.body.data.Email, 
+      subject: "VITAmin 接收讯息", // Subject line
+      text: "我收到个人的消息", // plain text body
+      html: "<h3>我收到个人的消息</h3><br/><a href=" + url + ">" + url +"</p>", // html body
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        return console.log(error.message);
+    }
+    console.log('success');
+});
+
 }
   })
 })
