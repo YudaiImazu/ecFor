@@ -291,7 +291,10 @@ app.post('/api/users/signup', async (req, res, next) => {
   const secretToken = randomstring.generate();
   const zeroForisValify = "0"
 
-  const url = "https://vitamin88.com//valify/user/" + secretToken
+  // const url = "https://vitamin88.com//valify/user/" + secretToken
+
+  const url = "https://vitamin88.com/valify/user/" + secretToken
+
 
   function insertNewUser (name, email, password, date, callback) {
    
@@ -310,9 +313,9 @@ app.post('/api/users/signup', async (req, res, next) => {
         let mailOptions = {
             from: 'kaihatsu@mingle.co.jp',
             to: email, 
-            subject: "VITAmin メール認証", // Subject line
-            text: "アカウント登録ありがとうございます", // plain text body
-            html: "<h3>下記のURLをクリックしてアカウント登録が完了します</h3><br/><a href=" + url + ">" + url +"</p>", // html body
+            subject: "VITAmin 邮件认证", // Subject line
+            text: "感谢您注册您的帐户", // plain text body
+            html: "<h3>感谢您注册您的帐户</h3><br/><h3>单击下面的URL完成帐户注册</h3><br/><a href=" + url + ">" + url +"</p>", // html body
         };
         
         transporter.sendMail(mailOptions, (error, info) => {
@@ -6373,6 +6376,29 @@ app.post("/api/company/admin/edit/m/and/a", async(req,res) => {
 
 
 ///// edit company M&A information   終了 /////
+
+
+app.get("/api/get/m/and/a/one/company/information/:id", async (req, res) => {
+console.log(req.params.id)
+  connection.query("select * from m_and_a_information WHERE id ='" + req.params.id + "';"  , function (err, results) {
+    if (err) throw err;
+    else {
+      console.log(results)
+      res.send({
+        MandAInformation: results
+      })
+    }
+  })
+})
+
+///// get one company M&A information   開始 /////
+
+
+
+
+///// get one company M&A information   終了 /////
+
+
 
 
 app.get("/api/products", (req, res) => {
